@@ -19,8 +19,9 @@ router.post('/login', function(req, res) {
     if(err || !user) {
       res.status(400).send(err);
     } else {
-      res.cookie('username', user.username);
-      res.cookie('userId', user._id.toString());
+      var token = user.token();
+      console.log('token:', token);
+      res.cookie('token', token);
       res.send(user);
     }
   });
