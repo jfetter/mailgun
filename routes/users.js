@@ -30,6 +30,7 @@ router.post('/login', function(req, res) {
 router.post('/logout', function(req, res) {
   res.clearCookie('username');
   res.clearCookie('userId');
+  res.clearCookie('token');
   res.send();
 })
 
