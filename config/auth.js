@@ -4,13 +4,22 @@ var User = require('../models/user');
 var jwt = require('jwt-simple');
 
 module.exports = function(req, res, next){
-  var token = req.cookies.token;
+  if(!req.headers.authorization){
+    return res.status(401).send('Authentication required.');
+  }
+
+  var auth = req.headers.authorization.split(' ');
+
+  if(auth[0] !== 'Bearer'){
+    return res.status(401).send('Authentication required.');
+  }
+
+  var token = auth[1];
 
   try {
     var payload = jwt.decode(token, process.env.JWT_SECRET);
   }
   catch(err){
-    console.log('error caught:', err);
     return res.status(401).send('Authentication required.');
   }
 

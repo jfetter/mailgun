@@ -34,11 +34,35 @@ describe('Turtles Route', function() {
       .get('/turtles')
       .set('Authorization', `Bearer ${token}`)
       .end(function(err, res){
+        expect(res.text).to.include('TURTLES');
         expect(err).to.be.null;
         expect(res).to.have.status(200);
         done();
       });
     });
+
+    it('should NOT return TURTLES - no auth header.', function(done) {
+      var token = testUser.token();
+      chai.request(app)
+      .get('/turtles')
+      // .set('Authorization', `Bearer ${token}`)
+      .end(function(err, res){
+        expect(res).to.have.status(401);
+        done();
+      });
+    });
+
+    it('should NOT return TURTLES - bad auth header.', function(done) {
+      var token = testUser.token();
+      chai.request(app)
+      .get('/turtles')
+      .set('Authorization', `Beerer ${token}`)
+      .end(function(err, res){
+        expect(res).to.have.status(401);
+        done();
+      });
+    });
+    
   });
 });
 
