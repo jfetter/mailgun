@@ -5,18 +5,42 @@ var chai = require('chai');
 var sinon = require('sinon');
 var expect = chai.expect;
 var chaiHttp = require('chai-http');
+var User = require('../../models/user');
 chai.use(chaiHttp);
 
 var app = require('../../app');
 
 var dbName = process.env.MONGO_URL.split('/').pop();
 
+var testUser;
+
 var cleanDb = function(done) {
   cp.execFile('./clean-db.sh', [dbName], {cwd: __dirname + '/../scripts/'}, function(){
-    done();
+    User.findById('0000000000000000000000a1', function(err, bob){
+      testUser = bob;
+      done();
+    });
   });
 };
 
+describe('Turtles Route', function() {
+  describe('GET /turtles', function() {
+
+    beforeEach(cleanDb);
+
+    it('should return TURTLES - if authenticated.', function(done) {
+      var token = testUser.token();
+      chai.request(app)
+      .get('/turtles')
+      .set('Authorization', `Bearer ${token}`)
+      .end(function(err, res){
+        expect(err).to.be.null;
+        expect(res).to.have.status(200);
+        done();
+      });
+    });
+  });
+});
 
 
 // describe('Books Route', function() {

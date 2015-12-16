@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var morgan = require('morgan');
 
-var mongoUrl = process.env.MONGOLAB_URI || 'mongodb://localhost/userauth';
+var mongoUrl = process.env.MONGOLAB_URI || process.env.MONGO_URL || 'mongodb://localhost/userauth';
 
 var mongoose = require('mongoose');
 mongoose.connect(mongoUrl, function(err){
@@ -39,3 +39,5 @@ app.use(function(req, res){
 app.listen(PORT, function(){
   console.log('Listening on port ', PORT);
 });
+
+module.exports = app;

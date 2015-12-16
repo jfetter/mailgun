@@ -2,15 +2,11 @@
   {
     "username": "bob",
     "password": "secure",
-    "books": [
-      {"$oid": "000000000000000000000002"}
-    ],
     "_id": {"$oid": "0000000000000000000000a1"}
   },
   {
     "username": "dave",
     "password": "notdave",
-    "books": [],
     "_id": {"$oid": "0000000000000000000000a2"}
   }
 ]
