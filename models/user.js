@@ -26,10 +26,10 @@ userSchema.methods.token = function() {
   return token;
 };
 
-userSchema.statics.register = function(user, cb) {
+userSchema.statics.register = function(user, cb) { 
   var username = user.username;
   var password = user.password;
-  var email = user.email;
+  var email = user.email; 
   var phone = user.phone;
   User.findOne({username: username}, function(err, user){
     if(err || user) return cb(err || 'Username already taken.');

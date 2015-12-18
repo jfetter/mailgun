@@ -30,31 +30,29 @@ router.post('/register', function(req, res) {
     var secret = (savedUser._id).toString()
       // + ":" + Date.now()
 
-    console.log("secret before encrypt", secret)
-    console.log("secret before encrypt", secret)
+      function encrypt(text) {
+        var cipher = crypto.createCipher(algorithm, password)
+        console.log("cipher", cipher)
+        var crypted = cipher.update(text, "utf8", "hex")
+        console.log("crypted1", crypted)
+        crypted += cipher.final("hex");
+        console.log("crypted2", crypted)
+        return crypted;
+      }
+      console.log("secret", secret)
+      var secret_code = (encrypt(secret));
 
-    function encrypt(secret) {
-      var cipher = crypto.createCipher(algorithm, password)
-      var crypted = cipher.update(secret, "utf8", "hex")
-      crypted += cipher.final("hex");
-      console.log("crypted", crypted)
-      return crypted;
-    }
-    console.log("secret_code", secret_code)
-    var secret_code = JSON.stringify(encrypt(secret));
-
-    var data = {
+      var data = {
       //Specify email data
       from: from_who,
       //The email to contact
       to: email,
       //Subject and text data  
       subject: 'Hello from Mailgun',
-      html: ' <a href="http://localhost:3000/users/validate?"' + secret_code + '> Click here to add your email address to a mailing list </a>'
+      html: ' <a href="http://localhost:3000/users/validate/' + secret_code + '"> Click here to add your email address to a mailing list </a>'
     }
-    console.log("DATA", data)
       //Invokes the method to send emails given the above data with the helper library
-    mailgun.messages().send(data, function(err, body) {
+      mailgun.messages().send(data, function(err, body) {
       //If there is an error, render the error page
       if (err) {
         console.log("MAILGUN got an error!!!!!!!!!! ", err);
@@ -62,26 +60,40 @@ router.post('/register', function(req, res) {
         console.log("MAILGUN SUBMITTED BODDDDYYYY", body);
       }
     });
-    res.status(err ? 400 : 200).send(err || savedUser);
-  });
-
+      res.status(err ? 400 : 200).send(err || savedUser);
+    });
 });
 
-//receive confirmation request from users by email link
-// router.get('/validate/:secret_code', function(req, res) {
-//   var secret_code =  req.params.secret_code
-//   console.log("secret_code", secret_code)
+// receive confirmation request from users by email link
+router.get('/validate/:secret', function(req, res) {
+  var secret =  req.params.secret
 
-//   function decrypt(secret_code){
-//     var decipher = crypto.createDecipher(algorithm, password)
-//     var dec = decipher.update(secret_code, 'hex', 'utf8')
-//     dec += decipher.final('utf8');
-//     return dec
-//   }
+  function decrypt(text){
+    var decipher = crypto.createDecipher(algorithm, password)
+    var dec = decipher.update(text, 'hex', 'utf8')
+    console.log("inside text!!", text);
+    console.log("dec", dec)
+    return dec;
+  }
+  var idFromParam = decrypt(secret);
+  console.log("idFromParam", idFromParam)
 
+  User.findById(idFromParam, function(err, user){
+    var now = Date.now();
+    console.log("user.createdAt", user)
+    if (now - user.createdAt <= 1000 * 60 * 60 * 24) {
+      console.log("timestamp valid!", (now - user.createdAt))
+      res.render('login', {title: 'Login'});
+      //change verified status
 
-//   res.render('login', {title: 'Login'});
-// })
+    }
+    else { 
+      //delete user info
+      res.send("Looks like we lost you!  Please register again")
+    }
+  })
+
+})
 
 
 router.post('/login', function(req, res) {
