@@ -76,23 +76,25 @@ router.get('/validate/:secret', function(req, res) {
     return dec;
   }
   var idFromParam = decrypt(secret);
-  console.log("idFromParam", idFromParam)
 
   User.findById(idFromParam, function(err, user){
     var now = Date.now();
-    console.log("user.createdAt", user)
     if (now - user.createdAt <= 1000 * 60 * 60 * 24) {
-      console.log("timestamp valid!", (now - user.createdAt))
-      res.render('login', {title: 'Login'});
-      //change verified status
-
+      //change verified status      
+      User.update(idFromParam, { $set: {verified: true}}, function(err, user){
+        if(err){
+          console.log("err", err)
+        } else {
+          console.log("user", user)
+          res.render('login', {title: 'Login'});
+        }
+      })
     }
     else { 
       //delete user info
       res.send("Looks like we lost you!  Please register again")
     }
   })
-
 })
 
 
