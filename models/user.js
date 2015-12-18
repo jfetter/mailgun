@@ -9,7 +9,9 @@ var User;
 
 var userSchema = Schema({
   username: { type: String, required: true, unique: true },
-  password: { type: String, required: true }
+  password: { type: String, required: true },
+  email: { type: String, required: true },
+  phone: { type: String, required: true }
 });
 
 userSchema.methods.token = function() {
@@ -25,6 +27,8 @@ userSchema.methods.token = function() {
 userSchema.statics.register = function(user, cb) {
   var username = user.username;
   var password = user.password;
+  var email = user.email;
+  var phone = user.phone;
   User.findOne({username: username}, function(err, user){
     if(err || user) return cb(err || 'Username already taken.');
     bcrypt.genSalt(13, function(err1, salt) {
@@ -32,6 +36,8 @@ userSchema.statics.register = function(user, cb) {
         if(err1 || err2) return cb(err1 || err2);
         var newUser = new User();
         newUser.username = username;
+        newUser.email = email;
+        newUser.phone = phone;
         newUser.password = hash;
         newUser.save(function(err, savedUser){
           savedUser.password = null;

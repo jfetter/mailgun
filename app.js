@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var morgan = require('morgan');
 
+
 var mongoUrl = process.env.MONGOLAB_URI || process.env.MONGO_URL || 'mongodb://localhost/userauth';
 
 var mongoose = require('mongoose');

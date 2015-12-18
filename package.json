@@ -1,5 +1,5 @@
 {
-  "name": "expresstest",
+  "name": "user-auth",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
@@ -24,6 +24,8 @@
     "express": "^4.13.3",
     "jade": "^1.11.0",
     "jwt-simple": "^0.3.1",
+    "mailgun": "^0.5.0",
+    "mailgun-js": "^0.7.7",
     "mongoose": "^4.2.6",
     "morgan": "^1.6.1",
     "sinon": "^1.17.2"
