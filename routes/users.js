@@ -9,6 +9,11 @@ var api_key = process.env.MAILGUN_KEY;
 var domain = process.env.MAILGUN_DOMAIN;
 var from_who = "jillian.fetter@gmail.com"
 
+var accountSid = process.env.TWILLIO_ACCOUNT_SID
+var authToken = process.env.TWILLIO_ACCOUNT_AUTHTOKEN
+
+var client = require('twilio')(accountSid, authToken); 
+
 var algorithm = "aes-256-gcm";
 // var iv = "60iP0h6vJoEa"; // deleted iv because it seems that we do not need it for text encryotion
 var password = 'd6F3Efeq'
@@ -55,9 +60,9 @@ router.post('/register', function(req, res) {
       mailgun.messages().send(data, function(err, body) {
       //If there is an error, render the error page
       if (err) {
-        console.log("MAILGUN got an error!!!!!!!!!! ", err);
+        console.log("MAILGUN got an error!", err);
       } else {
-        console.log("MAILGUN SUBMITTED BODDDDYYYY", body);
+        console.log("MAILGUN SUBMITTED BODY", body);
       }
     });
       res.status(err ? 400 : 200).send(err || savedUser);
@@ -99,6 +104,7 @@ router.get('/validate/:secret', function(req, res) {
 
 
 router.post('/login', function(req, res) {
+  //check if they confirmed by email.  Find user by id and 
   User.authenticate(req.body, function(err, user) {
     if (err || !user) {
       res.status(400).send(err);
@@ -109,6 +115,30 @@ router.post('/login', function(req, res) {
     }
   });
 });
+
+router.post("/forgotpass", function(req, res){  
+  var username = req.body.username;
+  var email = req.body.email;
+  User.find({username: username, email: email}, function(err, user){
+    if(err) {
+      res.send("could not find user")
+    } else {
+      client.messages.create({
+        to: "+15103586861",
+        from: "+15046845360",
+        body: "Hey! It's verified",
+      }, function(err, message){
+        if(err){
+          console.log("err after sending message", err)
+        }
+        console.log("message sent from twilio to the user!", message)
+      })
+      console.log(user);
+      res.send();
+    }
+  })
+})
+
 
 router.post('/logout', function(req, res) {
   res.clearCookie('username');
